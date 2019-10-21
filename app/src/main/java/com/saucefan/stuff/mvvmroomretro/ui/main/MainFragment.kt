@@ -18,10 +18,12 @@ import com.saucefan.stuff.mvvmroomretro.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.*
 import okhttp3.internal.platform.Platform.Companion.get
+import kotlin.random.Random
 
 
 class MainFragment : Fragment() {
-    val job = Job()
+
+    var job = Job()
     val ioScope = CoroutineScope(Dispatchers.IO + job)
     val uiScope = CoroutineScope(Dispatchers.Main + job)
     lateinit var ourView: TextView
@@ -48,13 +50,50 @@ class MainFragment : Fragment() {
             view1.text = newName[0].toString()
         }
 
-        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         viewModel.allUsers.observe(this,nameObserver)
 
         viewModel.allUsers()
         ourView = view2
         btn1.setOnClickListener {
-           doAsycThing()
+            //just so it's a repeatable action, since var job is in the scope of application, code continues,
+            // blah blah blah new Job() basically
+            job = Job()
+
+        //   doAsycThing() if we just want to get it done
+            // getAnAsyncObjectBack() lets us easily set as loading, or if there's an error, etc
+            //first hide other textview
+            view1.visibility=View.GONE
+            view3.visibility=View.GONE
+            //then we set deffered to the result of the getAnAsyncObject()
+            val deferred = getAnAsyncObjectBack()
+            //we can immediately set a loading message or what have you
+            if(deferred.isActive)  {
+                ourView.text="loading"
+            }
+            else if(deferred.isCancelled){
+                ourView.text="cancelled"
+            }
+            // there's likely a better way to do this, but it does work... until the delay goes off and we getthe result back,
+            //we see the loading message, then invokeOnCompletion is triggered
+
+            //we can also cancel this job with button 2
+            deferred.invokeOnCompletion {
+                uiScope.launch {
+                    Toast.makeText(view!!.context, deferred.await().toString(),Toast.LENGTH_SHORT).show()
+                    ourView.text=deferred.await().firstName
+                }
+            }
+        }
+        btn2.setOnClickListener {
+            if(job.isActive){
+                ourView.text="canceling"
+            }
+            job.cancel()
+            if(job.isCancelled){
+                ourView.text="the job is canceled"
+            }
+
+           // doAsycThingInOneMethod()
         }
     }
 
@@ -62,13 +101,32 @@ class MainFragment : Fragment() {
         ioScope.async {
             val returned = viewModel.findUser("first", "").await()
 callback(returned)
-        }
+    }
     }
 
 fun callback(userz: Userz) {
     uiScope.launch {
-        Toast.makeText(context, userz.toString(), Toast.LENGTH_SHORT).show()
-        ourView.text = userz.toString()
+        Toast.makeText(context,"${Random.nextInt(10)} $userz" , Toast.LENGTH_SHORT).show()
+        ourView.text = "${Random.nextInt(10)} $userz"
     }
 }
+
+
+fun doAsycThingInOneMethod()  {
+    ioScope.async {
+        val returned = viewModel.findUser("first", "").await()
+        uiScope.launch {
+            Toast.makeText(context, "${Random.nextInt(10)}  $returned", Toast.LENGTH_SHORT).show()
+            ourView.text = "${Random.nextInt(10)} $returned"
+        }
+    }
 }
+
+    fun getAnAsyncObjectBack():Deferred<Userz> =
+        ioScope.async {
+            delay(3000)
+             viewModel.findUser("first", "").await()
+
+        }
+
+        }
