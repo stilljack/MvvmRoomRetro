@@ -43,17 +43,20 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         viewModel = ViewModelProviders.of(this, LiveDataVMFactory(MyApp.instance)).get(MainViewModel::class.java)
-
         val nameObserver = Observer<List<Userz>> { newName ->
             view1.text = newName[0].toString()
         }
-
         viewModel.allUsers.observe(this,nameObserver)
-
         viewModel.allUsers()
+
+
+
+
         ourView = view2
+        btn2.isEnabled=false
+
+
         btn1.setOnClickListener {
             //just so it's a repeatable action, since var job is in the scope of application, code continues,
             // blah blah blah new Job() basically -- then we just have to join it to the scopes before, and we have
@@ -65,13 +68,16 @@ class MainFragment : Fragment() {
                uiScope = CoroutineScope(Dispatchers.Main + job)
             }
             btn1.isEnabled = false
+            btn2.isEnabled =true
         //   doAsycThing() if we just want to get it done
             // getAnAsyncObjectBack() lets us easily set as loading, or if there's an error, etc
             //first hide other textview
             view1.visibility=View.GONE
             view3.visibility=View.GONE
+
             //then we set deffered to the result of the getAnAsyncObject()
             val deferred = getAnAsyncObjectBack()
+
             //we can immediately set a loading message or what have you
             if(job.isActive)  {
                 ourView.text="loading"
@@ -92,6 +98,7 @@ class MainFragment : Fragment() {
                     Toast.makeText(view!!.context, deferred.await().toString(),Toast.LENGTH_SHORT).show()
                     ourView.text=deferred.await().firstName
                     btn1.isEnabled = true
+                    btn2.isEnabled = false
                     //we call job.complete() to set job.isCompleted so we can check if this job is done,
                     //and canceling is useless and displaying an indication that the completed job
                     // is canceled to the user would be
@@ -111,6 +118,7 @@ class MainFragment : Fragment() {
                 if (job.isCancelled) {
                     ourView.text = "the job is canceled"
                     btn1.isEnabled = true
+                    btn2.isEnabled=false
                 }
             }
 
@@ -145,6 +153,8 @@ fun doAsycThingInOneMethod()  {
 
     fun getAnAsyncObjectBack():Deferred<Userz> =
         ioScope.async {
+            //so there's time to actually cancel things manually or observe loading message
+            //we delay 3 seconds
             delay(3000)
              viewModel.findUser("first", "").await()
 
