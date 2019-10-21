@@ -59,7 +59,7 @@ class MainFragment : Fragment() {
             // blah blah blah new Job() basically -- then we just have to join it to the scopes before, and we have
             // an action that is cancelable and repeatable.
             Toast.makeText(it.context,job.toString(),Toast.LENGTH_LONG).show()
-           if (job.isCancelled) {
+           if (job.isCancelled || job.isCompleted) {
                 job = Job()
                ioScope = CoroutineScope(Dispatchers.IO + job)
                uiScope = CoroutineScope(Dispatchers.Main + job)
@@ -79,6 +79,10 @@ class MainFragment : Fragment() {
             else if(deferred.isCancelled){
                 ourView.text="cancelled"
             }
+            else if (deferred.isCompleted) {
+                val final =deferred.getCompleted()
+                ourView.text=final.toString()
+            }
             // there's likely a better way to do this, but it does work... until the delay goes off and we get the result back,
             //we see the loading message, then invokeOnCompletion is triggered
 
@@ -88,18 +92,26 @@ class MainFragment : Fragment() {
                     Toast.makeText(view!!.context, deferred.await().toString(),Toast.LENGTH_SHORT).show()
                     ourView.text=deferred.await().firstName
                     btn1.isEnabled = true
+                    //we call job.complete() to set job.isCompleted so we can check if this job is done,
+                    //and canceling is useless and displaying an indication that the completed job
+                    // is canceled to the user would be
+                    //confusing AND stupid
+                    job.complete()
                 }
             }
         }
         btn2.setOnClickListener {
-            if(job.isActive){
-                ourView.text="canceling"
-            }
-            //this is all it takes to cancel and ditch all the implications as the invokeOnCompletion Lambda will never fire.
-            job.cancel()
-            if(job.isCancelled){
-                ourView.text="the job is canceled"
-                btn1.isEnabled=true
+            //if the job is not completed, we cancel it
+            if (!job.isCompleted) {
+                if (job.isActive) {
+                    ourView.text = "canceling"
+                }
+                //this is all it takes to cancel and ditch all the implications as the invokeOnCompletion Lambda will never fire.
+                job.cancel()
+                if (job.isCancelled) {
+                    ourView.text = "the job is canceled"
+                    btn1.isEnabled = true
+                }
             }
 
            // doAsycThingInOneMethod()
