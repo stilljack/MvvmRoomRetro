@@ -16,6 +16,7 @@ import com.saucefan.stuff.mvvmroomretro.viewmodel.LiveDataVMFactory
 import com.saucefan.stuff.mvvmroomretro.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.*
+import java.lang.Thread.sleep
 import kotlin.random.Random
 
 
@@ -59,7 +60,7 @@ class MainFragment : Fragment() {
             //just so it's a repeatable action, since var job is in the scope of application, code continues,
             // blah blah blah new Job() basically -- then we just have to join it to the scopes before, and we have
             // an action that is cancelable and repeatable.
-            Toast.makeText(it.context,job.toString(),Toast.LENGTH_LONG).show()
+
            if (job.isCancelled || job.isCompleted) {
                 job = Job()
                ioScope = CoroutineScope(Dispatchers.IO + job)
@@ -109,10 +110,16 @@ class MainFragment : Fragment() {
             //if the job is not completed, we cancel it
             if (!job.isCompleted) {
                 if (job.isActive) {
+                    //setting the text view doesn't help much as canceling a job is basically instant
+                    //so we could pop a toast or snackbar to indicate to user that canceling is "processing"
                     ourView.text = "canceling"
+                    Toast.makeText(it.context, "Canceling",Toast.LENGTH_LONG).show()
                 }
                 //this is all it takes to cancel and ditch all the implications as the invokeOnCompletion Lambda will never fire.
+
                 job.cancel()
+
+
                 if (job.isCancelled) {
                     ourView.text = "the job is canceled"
                     btn1.isEnabled = true
