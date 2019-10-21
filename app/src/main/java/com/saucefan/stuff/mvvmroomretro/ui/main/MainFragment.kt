@@ -73,13 +73,13 @@ class MainFragment : Fragment() {
             //then we set deffered to the result of the getAnAsyncObject()
             val deferred = getAnAsyncObjectBack()
             //we can immediately set a loading message or what have you
-            if(deferred.isActive)  {
+            if(job.isActive)  {
                 ourView.text="loading"
             }
-            else if(deferred.isCancelled){
+            else if(job.isCancelled){
                 ourView.text="cancelled"
             }
-            else if (deferred.isCompleted) {
+            else if (job.isCompleted) {
                 val final =deferred.getCompleted()
                 ourView.text=final.toString()
             }
