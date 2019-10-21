@@ -24,8 +24,8 @@ import kotlin.random.Random
 class MainFragment : Fragment() {
 
     var job = Job()
-    val ioScope = CoroutineScope(Dispatchers.IO + job)
-    val uiScope = CoroutineScope(Dispatchers.Main + job)
+    var ioScope = CoroutineScope(Dispatchers.IO + job)
+    var uiScope = CoroutineScope(Dispatchers.Main + job)
     lateinit var ourView: TextView
 
     companion object {
@@ -56,9 +56,15 @@ class MainFragment : Fragment() {
         ourView = view2
         btn1.setOnClickListener {
             //just so it's a repeatable action, since var job is in the scope of application, code continues,
-            // blah blah blah new Job() basically
-            job = Job()
-
+            // blah blah blah new Job() basically -- then we just have to join it to the scopes before, and we have
+            // an action that is cancelable and repeatable.
+            Toast.makeText(it.context,job.toString(),Toast.LENGTH_LONG).show()
+           if (job.isCancelled) {
+                job = Job()
+               ioScope = CoroutineScope(Dispatchers.IO + job)
+               uiScope = CoroutineScope(Dispatchers.Main + job)
+            }
+            btn1.isEnabled = false
         //   doAsycThing() if we just want to get it done
             // getAnAsyncObjectBack() lets us easily set as loading, or if there's an error, etc
             //first hide other textview
@@ -73,7 +79,7 @@ class MainFragment : Fragment() {
             else if(deferred.isCancelled){
                 ourView.text="cancelled"
             }
-            // there's likely a better way to do this, but it does work... until the delay goes off and we getthe result back,
+            // there's likely a better way to do this, but it does work... until the delay goes off and we get the result back,
             //we see the loading message, then invokeOnCompletion is triggered
 
             //we can also cancel this job with button 2
@@ -81,6 +87,7 @@ class MainFragment : Fragment() {
                 uiScope.launch {
                     Toast.makeText(view!!.context, deferred.await().toString(),Toast.LENGTH_SHORT).show()
                     ourView.text=deferred.await().firstName
+                    btn1.isEnabled = true
                 }
             }
         }
@@ -88,9 +95,11 @@ class MainFragment : Fragment() {
             if(job.isActive){
                 ourView.text="canceling"
             }
+            //this is all it takes to cancel and ditch all the implications as the invokeOnCompletion Lambda will never fire.
             job.cancel()
             if(job.isCancelled){
                 ourView.text="the job is canceled"
+                btn1.isEnabled=true
             }
 
            // doAsycThingInOneMethod()
