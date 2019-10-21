@@ -16,6 +16,8 @@ abstract class ObjectDatabase : RoomDatabase() {
     abstract fun RoomDao(): RoomDao
 
     companion object {
+
+        //so we only get a single total instance of the database
         @Volatile
         private var INSTANCE: ObjectDatabase? = null
 
@@ -29,6 +31,7 @@ abstract class ObjectDatabase : RoomDatabase() {
                     context,
                     ObjectDatabase::class.java, "user_database")
                     .fallbackToDestructiveMigration() // when version increments, it migrates (deletes db and creates new) - else it crashes
+                   // this should only fire if the database is empty/first used and will fill it via the EntryDataBaseCallBack Method
                     .addCallback(EntryDatabaseCallback(GlobalScope))
                     .build()
                 INSTANCE=instance

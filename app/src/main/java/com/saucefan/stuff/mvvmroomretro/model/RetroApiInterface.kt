@@ -11,6 +11,8 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
+
+// this is little more than a placeholder at the moment
 interface RetroApi {
     @GET("search/movie?language=en-US&page=1&include_adult=false")
     fun getMoviesSearch(@Query("query")query: String,@Query("api_key")api_key:String) : Call<Userz>

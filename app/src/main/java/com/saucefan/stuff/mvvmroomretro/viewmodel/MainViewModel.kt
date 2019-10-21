@@ -14,7 +14,6 @@ import java.util.HashMap
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: ObjectRepo
 
-
     private val _mUsers = MediatorLiveData<List<Userz>>()
 
     val allUsers: LiveData<List<Userz>> = _mUsers  // 1
@@ -36,27 +35,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 }
 
-/*
-suspend fun fillAllUsers():LiveData<List<Userz>>{
-    val LdLU  =  viewModelScope.async {
-        repository.returnAllUsers()
-    }
-    LdLU.await()
-    return LdLU.await()
-
-}*/
-
-
-
-/*suspend fun fillAllUsers():LiveData<List<Userz>>{
-    val LdLU  =  viewModelScope.async {
-        repository.returnAllUsers()
-    }
-    LdLU.await()
- return LdLU.await()
-
-    }*/
-
+//this factory assures the same viewmodel will be used across activities/fragments, allowing easier persistance of LiveData,
+// easy sibling fragment communication, etc
 class LiveDataVMFactory (application: Application) : ViewModelProvider.Factory {
     val application = application
     //  private val dataSource = DefaultDataSource(Dispatchers.IO)
@@ -88,3 +68,24 @@ class LiveDataVMFactory (application: Application) : ViewModelProvider.Factory {
     }*/
     }
 }
+
+/*
+suspend fun fillAllUsers():LiveData<List<Userz>>{
+    val LdLU  =  viewModelScope.async {
+        repository.returnAllUsers()
+    }
+    LdLU.await()
+    return LdLU.await()
+
+}*/
+
+
+
+/*suspend fun fillAllUsers():LiveData<List<Userz>>{
+    val LdLU  =  viewModelScope.async {
+        repository.returnAllUsers()
+    }
+    LdLU.await()
+ return LdLU.await()
+
+    }*/

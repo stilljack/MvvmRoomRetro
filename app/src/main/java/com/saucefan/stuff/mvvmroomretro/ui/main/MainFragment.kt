@@ -26,12 +26,11 @@ class MainFragment : Fragment() {
     var ioScope = CoroutineScope(Dispatchers.IO + job)
     var uiScope = CoroutineScope(Dispatchers.Main + job)
     lateinit var ourView: TextView
+    private lateinit var viewModel: MainViewModel
 
     companion object {
         fun newInstance() = MainFragment()
     }
-
-    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +41,8 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        //viewmodel initialization
         viewModel = ViewModelProviders.of(this, LiveDataVMFactory(MyApp.instance))
             .get(MainViewModel::class.java)
         val nameObserver = Observer<List<Userz>> { newName ->
@@ -52,14 +53,16 @@ class MainFragment : Fragment() {
 
 
 
-
+        //grab the textview to change
         ourView = view2
+        //turn of cancel button til there's something to cancel
         btn2.isEnabled = false
 
 
         btn1.setOnClickListener {
-            //just so it's a repeatable action, since var job is in the scope of application, code continues,
-            // blah blah blah new Job() basically -- then we just have to join it to the scopes before, and we have
+            //just so it's a repeatable action, we reinitialize job if job has already been completed or canceled, if
+            // job.isActive, btn1 should not be enabled so we should not arrive here,
+            // blah blah blah new Job() basically -- then we just have to join it to the scopes, and we have
             // an action that is cancelable and repeatable.
 
             if (job.isCancelled || job.isCompleted) {
@@ -67,8 +70,10 @@ class MainFragment : Fragment() {
                 ioScope = CoroutineScope(Dispatchers.IO + job)
                 uiScope = CoroutineScope(Dispatchers.Main + job)
             }
+            //turn of request button and turn on cancel button
             btn1.isEnabled = false
             btn2.isEnabled = true
+
             //   doAsycThing() if we just want to get it done
             // getAnAsyncObjectBack() lets us easily set as loading, or if there's an error, etc
             //first hide other textview
@@ -88,20 +93,25 @@ class MainFragment : Fragment() {
                 ourView.text = final.toString()
             }
             // there's likely a better way to do this, but it does work... until the delay goes off and we get the result back,
-            //we see the loading message, then invokeOnCompletion is triggered
+            //we see the loading message, then invokeOnCompletion is triggered -- Please Note: the job itself is not completed
+            //until we call job.complete() -- hence we need to check if deferred is completed, not the job itself.
 
             //we can also cancel this job with button 2
             deferred.invokeOnCompletion {
+
                 uiScope.launch {
                     Toast.makeText(view!!.context, deferred.await().toString(), Toast.LENGTH_SHORT)
                         .show()
                     ourView.text = deferred.await().firstName
                     btn1.isEnabled = true
                     btn2.isEnabled = false
+
                     //we call job.complete() to set job.isCompleted so we can check if this job is done,
                     //and canceling is useless and displaying an indication that the completed job
                     // is canceled to the user would be
-                    //confusing AND stupid
+                    //confusing AND stupid -- additionally this lets us know that we need to make a new job if there is another request by
+                    // the same method
+
                     job.complete()
                 }
             }
@@ -127,17 +137,30 @@ class MainFragment : Fragment() {
                 }
             }
 
-            // doAsycThingInOneMethod()
+
         }
     }
 
+    //theres very little to this bit, of course some of what happens with the onclick Listerners could be either moved to other methods
+    // or to this one.
+    fun getAnAsyncObjectBack(): Deferred<Userz> =
+        ioScope.async {
+            //so there's time to actually cancel things manually or observe loading message
+            //we delay 3 seconds
+            delay(3000)
+            viewModel.findUser("first", "").await()
+
+        }
+
+    // these next two methods are in a call back style where the callback only fires after the first method completes
+    // unfortunately we still have to make sure we run the secondary code from Dispatchers.Main if we wish to alter the UI or
+    //otherwise do anything with context, to alter LiveData or similar, this would not be necessary
     fun doAsycThing() {
         ioScope.async {
             val returned = viewModel.findUser("first", "").await()
             callback(returned)
         }
     }
-
     fun callback(userz: Userz) {
         uiScope.launch {
             Toast.makeText(context, "${Random.nextInt(10)} $userz", Toast.LENGTH_SHORT).show()
@@ -145,7 +168,7 @@ class MainFragment : Fragment() {
         }
     }
 
-
+// identical function to the first two methods without a call back style.
     fun doAsycThingInOneMethod() {
         ioScope.async {
             val returned = viewModel.findUser("first", "").await()
@@ -157,13 +180,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    fun getAnAsyncObjectBack(): Deferred<Userz> =
-        ioScope.async {
-            //so there's time to actually cancel things manually or observe loading message
-            //we delay 3 seconds
-            delay(3000)
-            viewModel.findUser("first", "").await()
 
-        }
+
 
 }
