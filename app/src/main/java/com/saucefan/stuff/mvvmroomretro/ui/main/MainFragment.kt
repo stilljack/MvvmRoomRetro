@@ -24,7 +24,7 @@ class MainFragment : Fragment() {
     val job = Job()
     val ioScope = CoroutineScope(Dispatchers.IO + job)
     val uiScope = CoroutineScope(Dispatchers.Main + job)
-    lateinit var todoText: TextView
+    lateinit var ourView: TextView
 
     companion object {
         fun newInstance() = MainFragment()
@@ -52,7 +52,7 @@ class MainFragment : Fragment() {
         viewModel.allUsers.observe(this,nameObserver)
 
         viewModel.allUsers()
-        todoText = view2
+        ourView = view2
         btn1.setOnClickListener {
            doAsycThing()
         }
@@ -61,22 +61,14 @@ class MainFragment : Fragment() {
     fun doAsycThing()  {
         ioScope.async {
             val returned = viewModel.findUser("first", "").await()
-
-
 callback(returned)
-
-
-
-
-            // todoText.text=completed.toString()
         }
     }
 
-fun callback(deferred: Userz) {
+fun callback(userz: Userz) {
     uiScope.launch {
-        val deferred = deferred
-        Toast.makeText(context, deferred.toString(), Toast.LENGTH_SHORT).show()
-        view2.text = deferred.toString()
+        Toast.makeText(context, userz.toString(), Toast.LENGTH_SHORT).show()
+        ourView.text = userz.toString()
     }
 }
 }
