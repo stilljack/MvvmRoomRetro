@@ -1,8 +1,7 @@
 package com.saucefan.stuff.mvvmroomretro.viewmodel
 
-import androidx.lifecycle.LiveData
-import com.saucefan.stuff.mvvmroomretro.room.RoomDao
-import com.saucefan.stuff.mvvmroomretro.room.Userz
+import com.saucefan.stuff.mvvmroomretro.model.room.RoomDao
+import com.saucefan.stuff.mvvmroomretro.model.room.Userz
 
 class ObjectRepo (private val roomDao: RoomDao){
 

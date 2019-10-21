@@ -1,4 +1,4 @@
-package com.saucefan.stuff.mvvmroomretro.room
+package com.saucefan.stuff.mvvmroomretro.model.room
 
 import android.content.Context
 import androidx.room.Database

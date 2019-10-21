@@ -1,6 +1,5 @@
-package com.saucefan.stuff.mvvmroomretro.room
+package com.saucefan.stuff.mvvmroomretro.model.room
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert

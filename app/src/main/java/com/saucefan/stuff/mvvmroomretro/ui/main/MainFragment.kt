@@ -1,6 +1,5 @@
 package com.saucefan.stuff.mvvmroomretro.ui.main
 
-import android.app.ProgressDialog.show
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,12 +11,11 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.saucefan.stuff.mvvmroomretro.MyApp
 import com.saucefan.stuff.mvvmroomretro.R
-import com.saucefan.stuff.mvvmroomretro.room.Userz
+import com.saucefan.stuff.mvvmroomretro.model.room.Userz
 import com.saucefan.stuff.mvvmroomretro.viewmodel.LiveDataVMFactory
 import com.saucefan.stuff.mvvmroomretro.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.*
-import okhttp3.internal.platform.Platform.Companion.get
 import kotlin.random.Random
 
 

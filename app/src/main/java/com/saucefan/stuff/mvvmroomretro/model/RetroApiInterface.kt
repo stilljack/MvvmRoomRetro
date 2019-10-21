@@ -1,7 +1,7 @@
-package com.saucefan.stuff.mvvmroomretro.retrofit
+package com.saucefan.stuff.mvvmroomretro.model
 
 import com.google.gson.Gson
-import com.saucefan.stuff.mvvmroomretro.room.Userz
+import com.saucefan.stuff.mvvmroomretro.model.room.Userz
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call

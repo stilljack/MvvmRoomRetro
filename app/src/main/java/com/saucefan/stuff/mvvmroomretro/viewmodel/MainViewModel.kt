@@ -1,16 +1,13 @@
 package com.saucefan.stuff.mvvmroomretro.viewmodel
 
 import android.app.Application
-import android.provider.Contacts
 import androidx.lifecycle.*
-import com.saucefan.stuff.mvvmroomretro.room.ObjectDatabase
-import com.saucefan.stuff.mvvmroomretro.room.RoomDao
-import com.saucefan.stuff.mvvmroomretro.room.Userz
+import com.saucefan.stuff.mvvmroomretro.model.room.ObjectDatabase
+import com.saucefan.stuff.mvvmroomretro.model.room.RoomDao
+import com.saucefan.stuff.mvvmroomretro.model.room.Userz
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.reflect.Field
 import java.util.HashMap
 
 

@@ -1,8 +1,7 @@
-package com.saucefan.stuff.mvvmroomretro.room
+package com.saucefan.stuff.mvvmroomretro.model.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "userz")
