@@ -1,11 +1,14 @@
 package com.saucefan.stuff.mvvmroomretro.ui.main
 
+import android.app.ProgressDialog.show
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.saucefan.stuff.mvvmroomretro.MyApp
 import com.saucefan.stuff.mvvmroomretro.R
@@ -13,8 +16,15 @@ import com.saucefan.stuff.mvvmroomretro.room.Userz
 import com.saucefan.stuff.mvvmroomretro.viewmodel.LiveDataVMFactory
 import com.saucefan.stuff.mvvmroomretro.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.main_fragment.*
+import kotlinx.coroutines.*
+import okhttp3.internal.platform.Platform.Companion.get
+
 
 class MainFragment : Fragment() {
+    val job = Job()
+    val ioScope = CoroutineScope(Dispatchers.IO + job)
+    val uiScope = CoroutineScope(Dispatchers.Main + job)
+    lateinit var todoText: TextView
 
     companion object {
         fun newInstance() = MainFragment()
@@ -42,6 +52,31 @@ class MainFragment : Fragment() {
         viewModel.allUsers.observe(this,nameObserver)
 
         viewModel.allUsers()
+        todoText = view2
+        btn1.setOnClickListener {
+           doAsycThing()
+        }
     }
 
+    fun doAsycThing()  {
+        ioScope.async {
+            val returned = viewModel.findUser("first", "").await()
+
+
+callback(returned)
+
+
+
+
+            // todoText.text=completed.toString()
+        }
+    }
+
+fun callback(deferred: Userz) {
+    uiScope.launch {
+        val deferred = deferred
+        Toast.makeText(context, deferred.toString(), Toast.LENGTH_SHORT).show()
+        view2.text = deferred.toString()
+    }
+}
 }

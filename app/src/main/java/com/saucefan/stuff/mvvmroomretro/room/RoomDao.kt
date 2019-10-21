@@ -12,12 +12,17 @@ interface RoomDao {
    suspend fun returnAllUsers(): List<Userz>
 
   /*  @Query("SELECT * FROM userz WHERE :userIds IN user")
-    suspend fun loadAllByIds(userIds: IntArray): List<Userz>*/
+    suspend fun loadAllByIds(userIds: IntArray): List<Userz>
+    "SELECT * FROM userz WHERE first_name LIKE :first AND " +
+            "last_name LIKE :last LIMIT 1
 
-  //  @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
- //           "last_name LIKE :last LIMIT 1")
-  //  suspend  fun findByName(first: String, last: String): Userz
+    */
 
+  /* @Query("SELECT * FROM userz LIMIT 1")
+   suspend  fun findByName(first: String, last: String): Userz*/
+
+    @Query("SELECT * FROM userz LIMIT 1")
+    suspend  fun findByName(): Userz
     @Insert
     suspend  fun insertAll(vararg users: Userz)
 

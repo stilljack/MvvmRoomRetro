@@ -10,7 +10,9 @@ class ObjectRepo (private val roomDao: RoomDao){
         suspend fun returnAllUsers(): List<Userz> {
             return roomDao.returnAllUsers()
         }
-
+        suspend fun returnAUser(first:String,last:String):Userz {
+            return roomDao.findByName()
+        }
 
 
 }
